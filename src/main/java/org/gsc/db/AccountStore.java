@@ -1,5 +1,7 @@
 package org.gsc.db;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.gsc.config.Args;
 import org.gsc.module.Account;
@@ -28,7 +30,10 @@ public class AccountStore {
     @Autowired
     private Args config;
 
+    @Setter
+    @Getter
     private String dbName = "account";
+
     private boolean isCommit = false;
 
     public AccountStore() {
@@ -40,6 +45,7 @@ public class AccountStore {
     }
 
     public void init() {
+
         logger.info("* init account store... *");
 
         System.out.println(config.getThread());
@@ -57,6 +63,7 @@ public class AccountStore {
                 levelDbDataSource.flush();
             }
         }, 0, 5000);
+
     }
 
     public synchronized void storeAccount(byte[] address, byte[] privateKey) {
@@ -117,6 +124,15 @@ public class AccountStore {
         for (Account account : accounts) {
             logger.info("add account: " + Hex.toHexString(account.getAddress()));
             levelDbDataSource.put(account.getAddress(), account.getPrivateKey());
+        }
+    }
+
+    public void close(){
+        if (levelDbDataSource != null){
+            levelDbDataSource.close();
+            logger.info("Close account store.");
+        }else {
+            logger.info("Close account error! account store not exit!");
         }
     }
 }

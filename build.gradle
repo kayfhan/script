@@ -175,7 +175,6 @@ sourceSets {
             srcDir 'src/main/java'
         }
     }
-
 }
 
 protobuf {

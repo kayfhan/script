@@ -1,9 +1,12 @@
 package org.gsc;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gsc.common.application.Application;
+import org.gsc.common.application.ApplicationFactory;
+import org.gsc.common.application.ApplicationImpl;
 import org.gsc.config.Args;
-import org.gsc.db.AccountStore;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.gsc.common.application.ApplicationContext;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * @Auther: kay
@@ -13,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j
 public class Start {
 
-    @Autowired
-    private static AccountStore accountStore;
-
     public static void main(String[] args) {
 
         logger.info("---------- Starting... ----------");
@@ -23,6 +23,13 @@ public class Start {
         Args instance = Args.getInstance(args);
         System.out.println("Thread: " + instance.getThread());
 
-        accountStore = new AccountStore();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        System.out.println(beanFactory.isBeanNameInUse("ApplicationImpl"));
+        beanFactory.setAllowCircularReferences(false);
+        ApplicationContext context = new ApplicationContext(beanFactory);
+        context.refresh();
+
+        Application application = ApplicationFactory.create(context);
+        application.startup();
     }
 }
